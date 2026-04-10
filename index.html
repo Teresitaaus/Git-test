@@ -10,24 +10,118 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            margin: 0;
-            background: black;
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
         }
         canvas {
-            border: 1px solid white;
+            border: 2px solid #00FF00;
+            background-color: black;
+        }
+        #scoreboard {
+            font-size: 24px;
+            color: #00FF00;
         }
     </style>
 </head>
 <body>
+    <div id="scoreboard">
+        Player: <span id="playerScore">0</span> | Computer: <span id="computerScore">0</span>
+    </div>
     <canvas id="pong" width="800" height="400"></canvas>
+    <button id="reset">Reset</button>
     <script>
-        // Get canvas element and set up context
         const canvas = document.getElementById('pong');
-        const ctx = canvas.getContext('2d');
+        const context = canvas.getContext('2d');
 
-        // Create the Pong game here
-        // (Insert your game logic code here)
+        let paddleWidth = 10, paddleHeight = 100;
+        let playerPaddleY = (canvas.height - paddleHeight) / 2;
+        let computerPaddleY = (canvas.height - paddleHeight) / 2;
+        let ballRadius = 10;
+        let ballX = canvas.width / 2;
+        let ballY = canvas.height / 2;
+        let ballSpeedX = 5;
+        let ballSpeedY = 5;
+        let playerScore = 0, computerScore = 0;
 
+        function draw() {
+            // Clear canvas
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            // Draw paddles
+            context.fillStyle = '#00FF00';
+            context.fillRect(0, playerPaddleY, paddleWidth, paddleHeight);
+            context.fillRect(canvas.width - paddleWidth, computerPaddleY, paddleWidth, paddleHeight);
+            // Draw ball
+            context.beginPath();
+            context.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
+            context.fill();
+        }
+
+        function update() {
+            // Move ball
+            ballX += ballSpeedX;
+            ballY += ballSpeedY;
+            // Ball collision with top/bottom
+            if (ballY + ballRadius > canvas.height || ballY - ballRadius < 0) {
+                ballSpeedY = -ballSpeedY;
+            }
+            // Ball collision with paddles
+            if (ballX - ballRadius < paddleWidth && ballY > playerPaddleY && ballY < playerPaddleY + paddleHeight) {
+                ballSpeedX = -ballSpeedX;
+            } else if (ballX + ballRadius > canvas.width - paddleWidth && ballY > computerPaddleY && ballY < computerPaddleY + paddleHeight) {
+                ballSpeedX = -ballSpeedX;
+            }
+            // Score update
+            if (ballX - ballRadius < 0) {
+                computerScore++;
+                resetBall();
+            } else if (ballX + ballRadius > canvas.width) {
+                playerScore++;
+                resetBall();
+            }
+            // Move computer paddle
+            if (computerPaddleY + paddleHeight / 2 < ballY) {
+                computerPaddleY += 4;
+            } else {
+                computerPaddleY -= 4;
+            }
+            // Update scoreboard
+            document.getElementById('playerScore').innerText = playerScore;
+            document.getElementById('computerScore').innerText = computerScore;
+        }
+
+        function resetBall() {
+            ballX = canvas.width / 2;
+            ballY = canvas.height / 2;
+            ballSpeedX = -ballSpeedX;
+        }
+
+        function gameLoop() {
+            draw();
+            update();
+            requestAnimationFrame(gameLoop);
+        }
+
+        document.getElementById('reset').addEventListener('click', function() {
+            playerScore = 0;
+            computerScore = 0;
+            resetBall();
+        });
+
+        canvas.addEventListener('mousemove', function(e) {
+            let mouseY = e.clientY - canvas.getBoundingClientRect().top;
+            playerPaddleY = mouseY - paddleHeight / 2;
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowUp' && playerPaddleY > 0) {
+                playerPaddleY -= 20;
+            } else if (e.key === 'ArrowDown' && playerPaddleY < canvas.height - paddleHeight) {
+                playerPaddleY += 20;
+            }
+        });
+
+        gameLoop();
     </script>
 </body>
 </html>
