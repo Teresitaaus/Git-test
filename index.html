@@ -3,21 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pong Game</title>
+    <title>Game</title>
     <style>
         body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
             margin: 0;
-            background-color: #000;
-            color: #FFF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: black; /* Changed background to black */
         }
         canvas {
-            background: #FFF;
-            display: block;
-            margin: auto;
+            border: 1px solid white;
         }
         @media (max-width: 600px) {
             canvas {
@@ -25,89 +22,45 @@
                 height: auto;
             }
         }
+        /* Touch controls styling */
+        .touch-controls {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .button {
+            background-color: white;
+            border: none;
+            margin: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
-    <canvas id="pong" width="800" height="600"></canvas>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <div class="touch-controls">
+        <button class="button" onclick="moveLeft()">Left</button>
+        <button class="button" onclick="moveRight()">Right</button>
+        <button class="button" onclick="jump()">Jump</button>
+    </div>
     <script>
-        const canvas = document.getElementById('pong');
+        // Initialize game
+        const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-
-        // Resize the canvas to fit mobile screens
-        function resizeCanvas() {
-            canvas.width = window.innerWidth < 600 ? window.innerWidth : 800;
-            canvas.height = window.innerWidth < 600 ? window.innerWidth * (600 / 800) : 600;
+        // Game logic goes here
+        function moveLeft() {
+            // Move left logic
         }
 
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas(); // Initial resize
-
-        // Game variables
-        let paddleWidth = 10;
-        let paddleHeight = 100;
-        let playerPaddle = { x: 0, y: (canvas.height - paddleHeight) / 2 };
-        let enemyPaddle = { x: canvas.width - paddleWidth, y: (canvas.height - paddleHeight) / 2 };
-        let ball = { x: canvas.width / 2, y: canvas.height / 2, radius: 5, speed: 4, velocityX: 4, velocityY: 4 };
-
-        // Control the paddles
-        function touchStart(e) {
-            const touchY = e.touches[0].clientY;
-            playerPaddle.y = touchY - paddleHeight / 2;
+        function moveRight() {
+            // Move right logic
         }
 
-        canvas.addEventListener('touchstart', touchStart);
-
-        // Draw everything
-        function draw() {
-            // Clear the canvas
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            // Draw paddles
-            ctx.fillStyle = '#FFF';
-            ctx.fillRect(playerPaddle.x, playerPaddle.y, paddleWidth, paddleHeight);
-            ctx.fillRect(enemyPaddle.x, enemyPaddle.y, paddleWidth, paddleHeight);
-
-            // Draw ball
-            ctx.beginPath();
-            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2, false);
-            ctx.fill();
+        function jump() {
+            // Jump logic
         }
-
-        // Update game state
-        function update() {
-            ball.x += ball.velocityX;
-            ball.y += ball.velocityY;
-
-            // Collision detection with top and bottom
-            if (ball.y + ball.radius > canvas.height || ball.y - ball.radius < 0) {
-                ball.velocityY = -ball.velocityY;
-            }
-
-            // Collision detection with paddles
-            if (ball.x - ball.radius < playerPaddle.x + paddleWidth && ball.y > playerPaddle.y && ball.y < playerPaddle.y + paddleHeight) {
-                ball.velocityX = -ball.velocityX;
-            }
-            if (ball.x + ball.radius > enemyPaddle.x && ball.y > enemyPaddle.y && ball.y < enemyPaddle.y + paddleHeight) {
-                ball.velocityX = -ball.velocityX;
-            }
-
-            // Reset ball if it goes out
-            if (ball.x - ball.radius < 0 || ball.x + ball.radius > canvas.width) {
-                ball.x = canvas.width / 2;
-                ball.y = canvas.height / 2;
-                ball.velocityX = 4 * (Math.random() > 0.5 ? 1 : -1);
-                ball.velocityY = 4 * (Math.random() > 0.5 ? 1 : -1);
-            }
-        }
-
-        // Game loop
-        function game() {
-            draw();
-            update();
-            requestAnimationFrame(game);
-        }
-
-        game();
     </script>
 </body>
 </html>
